@@ -126,7 +126,7 @@ endif; ?>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h6 class="text-uppercase fw-bold mb-4">Quick Links</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="<?= url('/')?>" class="text-secondary text-decoration-none">Home</a>
@@ -140,7 +140,7 @@ endif; ?>
                     </ul>
                 </div>
 
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h6 class="text-uppercase fw-bold mb-4">Support</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="<?= url('/support')?>"
@@ -153,15 +153,7 @@ endif; ?>
                     </ul>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <h6 class="text-uppercase fw-bold mb-4">Newsletter</h6>
-                    <p class="text-secondary mb-4">Subscribe to our newsletter for the latest dining updates and offers.
-                    </p>
-                    <form class="d-flex">
-                        <input type="email" class="form-control rounded-start-pill border-0" placeholder="Your email">
-                        <button type="button" class="btn btn-primary rounded-end-pill px-4">Join</button>
-                    </form>
-                </div>
+            
             </div>
 
             <hr class="my-4 border-secondary opacity-25">

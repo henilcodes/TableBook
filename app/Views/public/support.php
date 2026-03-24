@@ -9,7 +9,7 @@ ob_start();
     </div>
 
     <div class="row g-4 mb-5">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card h-100 border-0 shadow-sm text-center p-4 rounded-4">
                 <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-block mx-auto mb-3">
                     <i class="bi bi-question-circle-fill text-primary fs-3"></i>
@@ -19,17 +19,7 @@ ob_start();
                 <a href="#faqs" class="btn btn-outline-primary btn-sm mt-auto">View FAQs</a>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center p-4 rounded-4">
-                <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mx-auto mb-3">
-                    <i class="bi bi-chat-dots-fill text-success fs-3"></i>
-                </div>
-                <h4>Live Support</h4>
-                <p class="text-muted">Chat with our support team for immediate assistance during business hours.</p>
-                <button class="btn btn-outline-success btn-sm mt-auto">Start Chat</button>
-            </div>
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card h-100 border-0 shadow-sm text-center p-4 rounded-4">
                 <div class="bg-info bg-opacity-10 p-3 rounded-circle d-inline-block mx-auto mb-3">
                     <i class="bi bi-envelope-fill text-info fs-3"></i>
