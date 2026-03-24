@@ -98,6 +98,18 @@ class CustomerAccountController extends Controller
         
         try {
             $this->reservationService->cancelReservation($reservationId);
+            
+            try {
+                $updatedReservation = $this->reservationRepo->findById($reservationId);
+                $customer = $this->customerRepo->findById($customerId);
+                if ($customer && !empty($customer['email'])) {
+                    $mailService = new \App\Services\MailService();
+                    $mailService->sendReservationStatusUpdate($updatedReservation, $customer['email']);
+                }
+            } catch (\Exception $e) {
+                error_log('Failed to send cancel email: ' . $e->getMessage());
+            }
+
             $_SESSION['success'] = 'Reservation cancelled successfully';
         } catch (\Exception $e) {
             $_SESSION['error'] = $e->getMessage();

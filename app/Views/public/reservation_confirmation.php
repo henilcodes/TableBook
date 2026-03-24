@@ -1,6 +1,16 @@
 <?php
 ob_start();
 ?>
+<style>
+@media print {
+    body { background-color: #fff !important; }
+    .navbar, footer, .d-print-none, .btn { display: none !important; }
+    .card { border: 1px solid #ddd !important; box-shadow: none !important; margin: 0 !important; }
+    .container { max-width: 100% !important; padding: 0 !important; }
+    .public-section { padding-top: 0 !important; }
+    .shadow-lg, .shadow-sm { box-shadow: none !important; }
+}
+</style>
 
 <div class="container public-section">
     <div class="row justify-content-center">
@@ -18,8 +28,8 @@ ob_start();
                     
                     <hr>
                     
-                    <h5>Reservation Details</h5>
-                    <table class="table">
+                    <h5 class="text-uppercase text-muted fw-bold d-print-none mb-3">Reservation Details</h5>
+                    <table class="table table-borderless table-sm mb-4">
                         <tr>
                             <th>Restaurant:</th>
                             <td><?= htmlspecialchars($reservation['restaurant_name']) ?></td>
@@ -76,8 +86,8 @@ ob_start();
                     
                     <?php if (!empty($cartItems)): ?>
                         <hr>
-                        <h5>Pre-Order</h5>
-                        <table class="table">
+                        <h5 class="text-uppercase text-muted fw-bold mb-3">Pre-Order Items</h5>
+                        <table class="table table-hover table-sm">
                             <thead>
                                 <tr>
                                     <th>Item</th>
@@ -101,19 +111,40 @@ ob_start();
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="3">Total:</th>
-                                    <th><?= currency($total) ?></th>
-                                </tr>
-                            </tfoot>
+                            </tbody>
                         </table>
                     <?php endif; ?>
+
+                    <hr class="mt-4 mb-4">
+                    <h5 class="text-uppercase text-muted fw-bold mb-3 text-end d-print-none">Payment Summary</h5>
+                    <div class="row justify-content-end">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm text-end align-middle">
+                                <?php if (!empty($cartItems)): ?>
+                                <tr>
+                                    <td>Pre-order Subtotal:</td>
+                                    <td width="30%"><?= currency($total) ?></td>
+                                </tr>
+                                <?php endif; ?>
+                                <tr>
+                                    <td>Table Booking Fee:</td>
+                                    <td width="30%"><?= currency(10) ?></td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td class="fw-bold fs-5 pt-2">Total Amount Paid:</td>
+                                    <td class="fw-bold fs-5 text-primary pt-2"><?= currency(($total ?? 0) + 10) ?></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                     
-                    <div class="text-center mt-4">
-                        <a href="<?= url('/') ?>" class="btn btn-primary">Back to Home</a>
+                    <div class="text-center mt-5 d-print-none">
+                        <button onclick="window.print()" class="btn btn-secondary rounded-pill px-4 me-2 shadow-sm">
+                            <i class="bi bi-printer me-2"></i> Print Invoice
+                        </button>
+                        <a href="<?= url('/') ?>" class="btn btn-primary rounded-pill px-4 shadow-sm me-2">Back to Home</a>
                         <?php if (!empty($_SESSION['customer_id'])): ?>
-                            <a href="<?= url('/account') ?>" class="btn btn-outline-primary">View My Reservations</a>
+                            <a href="<?= url('/account/reservations') ?>" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">View My Reservations</a>
                         <?php endif; ?>
                     </div>
                 </div>

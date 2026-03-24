@@ -1,8 +1,5 @@
 -- TableTap Reservation System Database Schema
 
-CREATE DATABASE IF NOT EXISTS tabletap CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE tabletap;
-
 -- Admin Users Table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,

@@ -214,6 +214,28 @@ class AdminController extends Controller
         }
         
         if ($this->reservationRepo->updateStatus($reservationId, $status)) {
+            // Send email notification to customer
+            try {
+                $updatedReservation = $this->reservationRepo->findById((int)$reservationId);
+                // We need customer email
+                $customerEmail = null;
+                if (!empty($updatedReservation['customer_id'])) {
+                    $customerRepo = new \App\Repositories\CustomerRepository();
+                    $customer = $customerRepo->findById($updatedReservation['customer_id']);
+                    $customerEmail = $customer['email'] ?? null;
+                } else {
+                    $guestData = $this->reservationRepo->getGuestDetails((int)$reservationId);
+                    $customerEmail = $guestData['guest_email'] ?? null;
+                }
+                
+                if ($customerEmail) {
+                    $mailService = new \App\Services\MailService();
+                    $mailService->sendReservationStatusUpdate($updatedReservation, $customerEmail);
+                }
+            } catch (\Exception $e) {
+                error_log('Failed to send status update email: ' . $e->getMessage());
+            }
+
             $this->json(['success' => true, 'message' => 'Reservation status updated']);
         } else {
             $this->json(['error' => 'Failed to update status'], 500);
@@ -251,7 +273,7 @@ class AdminController extends Controller
         header('Content-Disposition: attachment; filename="reservations_' . preg_replace('/[^a-z0-9_-]/i', '', $restaurant['slug']) . '_' . $date . '.csv"');
         
         $output = fopen('php://output', 'w');
-        fputcsv($output, ['Code', 'Date', 'Time', 'Table', 'Party Size', 'Customer', 'Phone', 'Order Qty', 'Order Total', 'Source', 'Status', 'Notes']);
+        fputcsv($output, ['Code', 'Date', 'Time', 'Table', 'Party Size', 'Customer', 'Phone', 'Order Qty', 'Order Total', 'Source', 'Status', 'Notes'], ',', '"', '\\');
         
         foreach ($reservations as $reservation) {
             fputcsv($output, [
@@ -267,7 +289,136 @@ class AdminController extends Controller
                 $reservation['reservation_source'] ?? 'web',
                 ucfirst($reservation['status']),
                 $reservation['notes'] ?? ''
-            ]);
+            ], ',', '"', '\\');
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function exportRestaurants()
+    {
+        $restaurants = $this->restaurantRepo->findAll();
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="restaurants_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['ID', 'Name', 'Slug', 'Cuisine', 'Address', 'Phone', 'Email', 'Rating', 'Created At'], ',', '"', '\\');
+        
+        foreach ($restaurants as $restaurant) {
+            fputcsv($output, [
+                $restaurant['id'],
+                $restaurant['name'],
+                $restaurant['slug'],
+                $restaurant['cuisine_type'],
+                $restaurant['address'],
+                $restaurant['phone'],
+                $restaurant['email'],
+                $restaurant['rating'],
+                $restaurant['created_at']
+            ], ',', '"', '\\');
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function exportTables($params)
+    {
+        $restaurant = $this->getRestaurantFromParams($params);
+        if (!$restaurant) $restaurant = $this->getDefaultRestaurant();
+        
+        if (!$restaurant) {
+            $this->redirect('/admin/restaurants');
+            return;
+        }
+
+        $tables = $this->restaurantRepo->getAllTablesAdmin($restaurant['id']);
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="tables_' . $restaurant['slug'] . '_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['Table Number', 'Section', 'Capacity', 'Min Party', 'Max Party', 'Seating', 'Status', 'Notes'], ',', '"', '\\');
+        
+        foreach ($tables as $table) {
+            fputcsv($output, [
+                $table['table_number'],
+                $table['section_name'],
+                $table['capacity'],
+                $table['min_party_size'],
+                $table['max_party_size'] ?: 'N/A',
+                ucfirst($table['seating_preference']),
+                $table['is_active'] ? 'Active' : 'Inactive',
+                $table['notes']
+            ], ',', '"', '\\');
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function exportMenu($params)
+    {
+        $restaurant = $this->getRestaurantFromParams($params);
+        if (!$restaurant) $restaurant = $this->getDefaultRestaurant();
+        
+        if (!$restaurant) {
+            $this->redirect('/admin/restaurants');
+            return;
+        }
+
+        $items = $this->restaurantRepo->getAllMenuItemsAdmin($restaurant['id']);
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="menu_' . $restaurant['slug'] . '_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['Name', 'Category', 'Description', 'Price', 'Available', 'Veg/Non-Veg', 'Spiciness'], ',', '"', '\\');
+        
+        foreach ($items as $item) {
+            fputcsv($output, [
+                $item['name'],
+                $item['category_name'],
+                $item['description'],
+                number_format($item['price'], 2),
+                $item['is_available'] ? 'Yes' : 'No',
+                $item['is_vegetarian'] ? 'Veg' : 'Non-Veg',
+                $item['spice_level']
+            ], ',', '"', '\\');
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function exportHours($params)
+    {
+        $restaurant = $this->getRestaurantFromParams($params);
+        if (!$restaurant) $restaurant = $this->getDefaultRestaurant();
+        
+        if (!$restaurant) {
+            $this->redirect('/admin/restaurants');
+            return;
+        }
+
+        $hours = $this->restaurantRepo->getHours($restaurant['id']);
+        $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="hours_' . $restaurant['slug'] . '_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['Day', 'Status', 'Open Time', 'Close Time'], ',', '"', '\\');
+        
+        foreach ($hours as $hour) {
+            fputcsv($output, [
+                $days[$hour['day_of_week']],
+                $hour['is_closed'] ? 'Closed' : 'Open',
+                $hour['is_closed'] ? '-' : date('g:i A', strtotime($hour['open_time'])),
+                $hour['is_closed'] ? '-' : date('g:i A', strtotime($hour['close_time']))
+            ], ',', '"', '\\');
         }
         
         fclose($output);
@@ -391,6 +542,54 @@ class AdminController extends Controller
 
         $_SESSION['success'] = 'Restaurant updated successfully.';
         $this->redirect('/admin/restaurants');
+    }
+
+    public function exportDashboardStats()
+    {
+        $restaurants = $this->restaurantRepo->findAll();
+        $restaurant = null;
+        $requestedRestaurantId = isset($_GET['restaurant_id']) ? (int)$_GET['restaurant_id'] : 0;
+        if ($requestedRestaurantId > 0) {
+            $restaurant = $this->restaurantRepo->findById($requestedRestaurantId);
+        }
+        if (!$restaurant) {
+            $restaurant = $restaurants[0] ?? null;
+        }
+        
+        if (!$restaurant) {
+            $this->redirect('/admin');
+            return;
+        }
+
+        // Gather same stats as dashboard()
+        $allReservations = $this->reservationRepo->getAllForRestaurant($restaurant['id']);
+        $tables = $this->restaurantRepo->getAllTablesAdmin($restaurant['id']);
+        $items = $this->restaurantRepo->getAllMenuItemsAdmin($restaurant['id']);
+        
+        $stats = [
+            ['Metric', 'Value'],
+            ['Total Reservations', count($allReservations)],
+            ['Confirmed', count(array_filter($allReservations, fn($r) => $r['status'] === 'confirmed'))],
+            ['Pending', count(array_filter($allReservations, fn($r) => $r['status'] === 'pending'))],
+            ['Seated', count(array_filter($allReservations, fn($r) => $r['status'] === 'seated'))],
+            ['Completed', count(array_filter($allReservations, fn($r) => $r['status'] === 'completed'))],
+            ['Cancelled', count(array_filter($allReservations, fn($r) => $r['status'] === 'cancelled'))],
+            ['No Show', count(array_filter($allReservations, fn($r) => $r['status'] === 'no_show'))],
+            ['Total Tables', count($tables)],
+            ['Active Tables', count(array_filter($tables, fn($t) => !empty($t['is_active'])))],
+            ['Total Menu Items', count($items)],
+            ['Available Items', count(array_filter($items, fn($i) => !empty($i['is_available'])))],
+        ];
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="stats_' . $restaurant['slug'] . '_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        foreach ($stats as $row) {
+            fputcsv($output, $row, ',', '"', '\\');
+        }
+        fclose($output);
+        exit;
     }
 
     public function deleteRestaurant($params)

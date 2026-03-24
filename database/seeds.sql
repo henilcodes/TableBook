@@ -1,6 +1,3 @@
--- TableTap Reservation System Seed Data
-
-USE tabletap;
 
 -- Admin User
 INSERT INTO users (username, email, password_hash, role) VALUES
@@ -160,6 +157,63 @@ INSERT INTO cart_items (cart_id, menu_item_id, quantity, price, notes) VALUES
 (@cart_attached, @menu_item_1, 1, 8.99, 'No extra garlic'),
 (@cart_attached, @menu_item_2, 2, 14.99, 'Extra chili'),
 (@cart_guest, @menu_item_1, 1, 8.99, NULL);
+
+-- Second Restaurant (Sushi Bar)
+INSERT INTO restaurants (name, slug, description, cuisine_type, address, phone, email, image_url, rating) VALUES
+('Sakura Sushi', 'sakura-sushi', 'Premium authentic Japanese sushi and sashimi prepared by master chefs in a serene atmosphere.', 'Japanese', '456 Ocean Drive, City, State 12345', '555-2000', 'hello@sakurasushi.com', 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80', 4.8);
+
+SET @restaurant2_id = LAST_INSERT_ID();
+
+INSERT INTO restaurant_hours (restaurant_id, day_of_week, open_time, close_time, is_closed) VALUES
+(@restaurant2_id, 0, '17:00:00', '22:00:00', FALSE),
+(@restaurant2_id, 1, '00:00:00', '00:00:00', TRUE),
+(@restaurant2_id, 2, '17:00:00', '22:00:00', FALSE),
+(@restaurant2_id, 3, '17:00:00', '22:00:00', FALSE),
+(@restaurant2_id, 4, '17:00:00', '22:00:00', FALSE),
+(@restaurant2_id, 5, '17:00:00', '23:00:00', FALSE),
+(@restaurant2_id, 6, '17:00:00', '23:00:00', FALSE);
+
+INSERT INTO table_sections (restaurant_id, name, description, display_order, is_active) VALUES
+(@restaurant2_id, 'Sushi Bar', 'Action seating right at the chef counter', 1, TRUE),
+(@restaurant2_id, 'Dining Room', 'Traditional seating', 2, TRUE);
+
+SET @s2_bar = (SELECT id FROM table_sections WHERE restaurant_id = @restaurant2_id AND name = 'Sushi Bar' LIMIT 1);
+SET @s2_room = (SELECT id FROM table_sections WHERE restaurant_id = @restaurant2_id AND name = 'Dining Room' LIMIT 1);
+
+INSERT INTO tables (restaurant_id, section_id, table_number, capacity, min_party_size, max_party_size, seating_preference, sort_order, notes, is_active) VALUES
+(@restaurant2_id, @s2_bar, 'C1', 2, 1, 2, 'bar', 1, 'Omakase seating', TRUE),
+(@restaurant2_id, @s2_bar, 'C2', 2, 1, 2, 'bar', 2, 'Omakase seating', TRUE),
+(@restaurant2_id, @s2_room, 'D1', 4, 2, 4, 'indoor', 3, 'Tatami mat', TRUE),
+(@restaurant2_id, @s2_room, 'D2', 4, 2, 4, 'indoor', 4, 'Tatami mat', TRUE);
+
+INSERT INTO menu_categories (restaurant_id, name, description, image_url, is_active, display_order) VALUES
+(@restaurant2_id, 'Starters', 'Edamame and appetizers', NULL, TRUE, 1),
+(@restaurant2_id, 'Sashimi', 'Fresh daily fish', NULL, TRUE, 2),
+(@restaurant2_id, 'Rolls', 'Crafted maki rolls', NULL, TRUE, 3);
+
+SET @c2_start = (SELECT id FROM menu_categories WHERE restaurant_id = @restaurant2_id AND name = 'Starters' LIMIT 1);
+SET @c2_sashimi = (SELECT id FROM menu_categories WHERE restaurant_id = @restaurant2_id AND name = 'Sashimi' LIMIT 1);
+SET @c2_rolls = (SELECT id FROM menu_categories WHERE restaurant_id = @restaurant2_id AND name = 'Rolls' LIMIT 1);
+
+INSERT INTO menu_items (restaurant_id, category_id, sku, name, description, price, prep_time_minutes, is_available) VALUES
+(@restaurant2_id, @c2_start, 'STAR-01', 'Edamame', 'Steamed soybeans', 5.00, 5, TRUE),
+(@restaurant2_id, @c2_sashimi, 'SASH-01', 'Salmon Nigiri', '2 pieces', 7.50, 5, TRUE),
+(@restaurant2_id, @c2_rolls, 'ROLL-01', 'Spicy Tuna Roll', 'Spicy tuna, cucumber', 9.50, 8, TRUE);
+
+-- Third Restaurant (Burger Joint)
+INSERT INTO restaurants (name, slug, description, cuisine_type, address, phone, email, image_url, rating) VALUES
+('Urban Burgers', 'urban-burgers', 'Gourmet smashed burgers, loaded fries, and crazy thick milkshakes.', 'American', '789 Downtown Ave, City, State 12345', '555-3000', 'hello@urbanburgers.com', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80', 4.3);
+
+SET @restaurant3_id = LAST_INSERT_ID();
+
+INSERT INTO restaurant_hours (restaurant_id, day_of_week, open_time, close_time, is_closed) VALUES
+(@restaurant3_id, 0, '11:00:00', '21:00:00', FALSE),
+(@restaurant3_id, 1, '11:00:00', '21:00:00', FALSE),
+(@restaurant3_id, 2, '11:00:00', '21:00:00', FALSE),
+(@restaurant3_id, 3, '11:00:00', '21:00:00', FALSE),
+(@restaurant3_id, 4, '11:00:00', '22:00:00', FALSE),
+(@restaurant3_id, 5, '11:00:00', '23:00:00', FALSE),
+(@restaurant3_id, 6, '11:00:00', '23:00:00', FALSE);
 
 -- Sample Audit Logs
 INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES

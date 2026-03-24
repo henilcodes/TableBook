@@ -9,14 +9,16 @@
     <link rel="stylesheet" href="<?= url('/public/assets/css/app.css') ?>">
     <style>
         body.admin-body {
-            background: linear-gradient(180deg, #f5f7fb 0%, #eef2f8 100%);
-            color: #12263a;
+            background-color: var(--tt-bg);
+            background-image: radial-gradient(at 0% 0%, rgba(31, 122, 140, 0.03) 0px, transparent 50%);
+            color: var(--tt-text);
         }
         .admin-topbar {
-            background: linear-gradient(120deg, #17324d 0%, #1f7a8c 100%);
-            box-shadow: 0 10px 26px rgba(18,38,58,.2);
+            background: linear-gradient(135deg, var(--tt-secondary) 0%, var(--tt-primary) 100%);
+            box-shadow: var(--tt-shadow-md);
             padding-top: .7rem;
             padding-bottom: .7rem;
+            border-bottom: 1px solid rgba(255,255,255,.1);
         }
         .admin-topbar .navbar-brand {
             font-weight: 800;
@@ -26,17 +28,17 @@
             display: inline-flex;
             align-items: center;
             gap: .5rem;
-            background: rgba(255,255,255,.16);
+            background: rgba(255,255,255,.12);
             color: #fff;
-            border: 1px solid rgba(255,255,255,.24);
+            border: 1px solid rgba(255,255,255,.2);
             border-radius: 999px;
             padding: .28rem .8rem;
             font-size: .9rem;
         }
         .admin-sidebar {
             min-height: calc(100vh - 64px);
-            background: linear-gradient(180deg, #162b43 0%, #102033 100%);
-            border-right: 1px solid rgba(255,255,255,.06);
+            background: var(--tt-secondary);
+            border-right: 1px solid rgba(255,255,255,.05);
             padding: 1rem .75rem;
         }
         .admin-nav {
@@ -48,59 +50,63 @@
             border: 0;
             border-radius: 12px;
             background: transparent;
-            color: rgba(255,255,255,.83);
+            color: rgba(255,255,255,.75);
             font-weight: 600;
             padding: .68rem .82rem;
+            transition: all 0.2s ease;
         }
         .admin-nav .list-group-item:hover {
-            background: rgba(255,255,255,.09);
+            background: rgba(255,255,255,.08);
             color: #fff;
         }
         .admin-nav .list-group-item.active {
-            background: rgba(255,255,255,.16) !important;
+            background: var(--tt-primary) !important;
             color: #fff !important;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+            box-shadow: 0 4px 12px rgba(31, 122, 140, 0.3);
         }
         .admin-content {
             padding: 1.5rem;
         }
         .admin-content .card {
-            border: 1px solid #e7ebf3;
+            border: 1px solid var(--tt-border);
             border-radius: 16px;
-            box-shadow: 0 10px 26px rgba(15,23,42,.05);
+            box-shadow: var(--tt-shadow-sm);
+            background: #fff;
         }
         .admin-content .card-header {
-            background: #f9fbff;
-            border-bottom-color: #e7ebf3;
+            background: #fff;
+            border-bottom: 1px solid var(--tt-border);
             padding: .9rem 1rem;
+            font-weight: 700;
         }
         .admin-content .card-body {
             padding: 1rem 1.05rem;
         }
         .admin-page-head {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         .admin-page-head h2 {
             margin-bottom: .2rem;
             font-weight: 800;
-            letter-spacing: .15px;
+            color: var(--tt-secondary);
         }
         .admin-form-card .form-label {
-            font-size: .85rem;
+            font-size: .8rem;
             text-transform: uppercase;
-            letter-spacing: .35px;
-            color: #475467;
-            margin-bottom: .35rem;
+            letter-spacing: .5px;
+            color: var(--tt-text-light);
+            font-weight: 700;
         }
         .admin-form-card .form-control,
         .admin-form-card .form-select {
-            min-height: 44px;
-            border-color: #d8dfeb;
+            border-radius: 10px;
+            border: 2px solid #edf2f7;
+            padding: 0.6rem 0.8rem;
         }
         .admin-form-card .form-control:focus,
         .admin-form-card .form-select:focus {
-            border-color: #1f7a8c;
-            box-shadow: 0 0 0 .22rem rgba(31,122,140,.14);
+            border-color: var(--tt-primary);
+            box-shadow: 0 0 0 3px var(--tt-primary-glow);
         }
         .admin-form-card h6.text-uppercase {
             font-size: .76rem;

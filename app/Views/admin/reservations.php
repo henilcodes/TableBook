@@ -54,7 +54,7 @@ ob_start();
                 <a href="<?= url('/admin/reservations?restaurant_id=' . (int)$restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>" class="btn btn-outline-secondary">
                     Reset
                 </a>
-                <a href="<?= url('/admin/export/reservations?restaurant_id=' . (int)$restaurant['id'] . '&date=' . urlencode($selectedDate) . '&status=' . urlencode($selectedStatus ?? 'all') . '&search=' . urlencode($searchTerm ?? '')) ?>" class="btn btn-success ms-auto">
+                <a href="<?= url('/admin/reservations/export?restaurant_id=' . (int)$restaurant['id'] . '&date=' . urlencode($selectedDate) . '&status=' . urlencode($selectedStatus ?? 'all') . '&search=' . urlencode($searchTerm ?? '')) ?>" class="btn btn-success ms-auto">
                     <i class="bi bi-download"></i> Export CSV
                 </a>
             </div>

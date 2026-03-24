@@ -7,9 +7,14 @@ ob_start();
         <h2 class="mb-1">Menu Items</h2>
         <p class="text-muted mb-0">Manage dishes and prices for <?= htmlspecialchars($restaurant['name']) ?>.</p>
     </div>
-    <a href="<?= url('/admin/restaurants/' . $restaurant['id'] . '/menu/items/create') ?>" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Add Item
-    </a>
+    <div class="d-flex gap-2">
+        <a href="<?= url('/admin/restaurants/' . $restaurant['id'] . '/menu/export') ?>" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+        </a>
+        <a href="<?= url('/admin/restaurants/' . $restaurant['id'] . '/menu/items/create') ?>" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Item
+        </a>
+    </div>
 </div>
 
 <div class="card">

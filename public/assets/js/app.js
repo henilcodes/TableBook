@@ -1,74 +1,126 @@
 (function () {
-  function showToast(message, type) {
-    const level = type || "info";
+  /**
+   * Toast Notification System
+   */
+  function showToast(message, type = "info") {
     const wrapper = document.querySelector(".toast-container") || createToastContainer();
     const toast = document.createElement("div");
-    toast.className = "toast show";
+    toast.className = `toast animate-fade-up`;
     toast.setAttribute("role", "alert");
-    const headerClass = level === "success" ? "bg-success" : level === "error" ? "bg-danger" : "bg-primary";
-    const title = level === "success" ? "Success" : level === "error" ? "Error" : "Info";
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    const headerClass = type === "success" ? "bg-success" : type === "error" ? "bg-danger" : "bg-dark";
+    const icon = type === "success" ? "bi-check-circle-fill" : type === "error" ? "bi-exclamation-triangle-fill" : "bi-info-circle-fill";
+    
     toast.innerHTML = `
-      <div class="toast-header ${headerClass} text-white">
-        <strong class="me-auto">${title}</strong>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+      <div class="toast-header ${headerClass} border-0 py-2">
+        <i class="bi ${icon} me-2"></i>
+        <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
       </div>
-      <div class="toast-body">${escapeHtml(message)}</div>
+      <div class="toast-body p-3">
+        ${escapeHtml(message)}
+      </div>
     `;
+    
     wrapper.appendChild(toast);
-    setTimeout(function () {
-      if (window.bootstrap) {
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.hide();
-      } else {
-        toast.remove();
-      }
-    }, 4000);
+    
+    if (window.bootstrap) {
+      const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
+      bsToast.show();
+      toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    } else {
+      setTimeout(() => toast.remove(), 5000);
+    }
   }
 
   function createToastContainer() {
     const container = document.createElement("div");
-    container.className = "toast-container";
+    container.className = "toast-container position-fixed top-0 end-0 p-3";
+    container.style.zIndex = "2000";
     document.body.appendChild(container);
     return container;
   }
 
-  function setButtonLoading(button, isLoading, loadingText) {
+  /**
+   * Button Loading States
+   */
+  function setButtonLoading(button, isLoading, loadingText = "Processing...") {
     if (!button) return;
     if (isLoading) {
-      button.dataset.originalText = button.innerHTML;
+      button.dataset.originalContent = button.innerHTML;
       button.disabled = true;
-      const text = loadingText || "Loading";
-      button.innerHTML = `<span class=\"spinner-border spinner-border-sm me-2\" role=\"status\" aria-hidden=\"true\"></span>${text}`;
+      button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${loadingText}`;
     } else {
       button.disabled = false;
-      button.innerHTML = button.dataset.originalText || button.innerHTML;
+      button.innerHTML = button.dataset.originalContent || button.innerHTML;
     }
   }
 
-  function initSessionToasts() {
-    if (!window.bootstrap) return;
-    document.querySelectorAll(".toast").forEach(function (toastEl) {
-      const toast = new bootstrap.Toast(toastEl, { delay: 4200 });
-      toast.show();
+  /**
+   * Form Validation
+   */
+  function initFormValidation() {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+          showToast("Please fix the highlighted errors in the form.", "error");
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }
+
+  /**
+   * Entrance Animations
+   */
+  function initAnimations() {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px"
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-up');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card, .hero-section, .section-title').forEach(el => {
+      el.style.opacity = "0";
+      observer.observe(el);
     });
   }
 
   function escapeHtml(text) {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   window.TableTapUI = {
-    showToast: showToast,
-    setButtonLoading: setButtonLoading,
-    initSessionToasts: initSessionToasts
+    showToast,
+    setButtonLoading,
+    initFormValidation,
+    initAnimations
   };
 
   document.addEventListener("DOMContentLoaded", function () {
-    initSessionToasts();
+    // Initialize toasts from session if any
+    if (window.bootstrap) {
+      document.querySelectorAll(".toast").forEach(el => {
+        new bootstrap.Toast(el, { delay: 5000 }).show();
+      });
+    }
+    
+    initFormValidation();
+    initAnimations();
   });
 })();

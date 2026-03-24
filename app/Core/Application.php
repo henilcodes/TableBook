@@ -20,6 +20,13 @@ class Application
         $this->router->get('/availability', [\App\Controllers\PublicController::class, 'checkAvailability']);
         $this->router->post('/reservation', [\App\Controllers\PublicController::class, 'createReservation']);
         $this->router->get('/reservation/{code}', [\App\Controllers\PublicController::class, 'viewReservation']);
+        $this->router->get('/payment/checkout', [\App\Controllers\PublicController::class, 'payment']);
+        $this->router->post('/verify-payment', [\App\Controllers\PublicController::class, 'verifyPayment']);
+        $this->router->get('/about', [\App\Controllers\PublicController::class, 'about']);
+        $this->router->get('/contact', [\App\Controllers\PublicController::class, 'contact']);
+        $this->router->post('/contact/send', [\App\Controllers\PublicController::class, 'contactSend']);
+        $this->router->get('/privacy', [\App\Controllers\PublicController::class, 'privacy']);
+        $this->router->get('/support', [\App\Controllers\PublicController::class, 'support']);
         
         // Customer Auth routes
         $this->router->get('/login', [\App\Controllers\CustomerAuthController::class, 'showLogin']);
@@ -49,7 +56,12 @@ class Application
         $this->router->get('/admin', [\App\Controllers\AdminController::class, 'dashboard'], [\App\Middleware\AuthMiddleware::class]);
         $this->router->get('/admin/reservations', [\App\Controllers\AdminController::class, 'reservations'], [\App\Middleware\AuthMiddleware::class]);
         $this->router->post('/admin/reservations/{id}/status', [\App\Controllers\AdminController::class, 'updateReservationStatus'], [\App\Middleware\AuthMiddleware::class]);
-        $this->router->get('/admin/export/reservations', [\App\Controllers\AdminController::class, 'exportReservations'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/reservations/export', [\App\Controllers\AdminController::class, 'exportReservations'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/restaurants/export', [\App\Controllers\AdminController::class, 'exportRestaurants'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/restaurants/{restaurant_id}/tables/export', [\App\Controllers\AdminController::class, 'exportTables'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/restaurants/{restaurant_id}/menu/export', [\App\Controllers\AdminController::class, 'exportMenu'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/restaurants/{restaurant_id}/hours/export', [\App\Controllers\AdminController::class, 'exportHours'], [\App\Middleware\AuthMiddleware::class]);
+        $this->router->get('/admin/dashboard/export', [\App\Controllers\AdminController::class, 'exportDashboardStats'], [\App\Middleware\AuthMiddleware::class]);
 
         // Admin restaurant management
         $this->router->get('/admin/restaurants', [\App\Controllers\AdminController::class, 'restaurants'], [\App\Middleware\AuthMiddleware::class]);

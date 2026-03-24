@@ -7,9 +7,14 @@ ob_start();
         <h2 class="mb-1">Restaurant Hours</h2>
         <p class="text-muted mb-0">Manage weekly opening hours for <?= htmlspecialchars($restaurant['name']) ?>.</p>
     </div>
-    <a href="<?= url('/admin/restaurants/' . (int)$restaurant['id'] . '/edit') ?>" class="btn btn-outline-primary">
-        <i class="bi bi-shop"></i> Restaurant Profile
-    </a>
+    <div class="d-flex gap-2">
+        <a href="<?= url('/admin/restaurants/' . (int)$restaurant['id'] . '/hours/export') ?>" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+        </a>
+        <a href="<?= url('/admin/restaurants/' . (int)$restaurant['id'] . '/edit') ?>" class="btn btn-outline-primary">
+            <i class="bi bi-shop"></i> Restaurant Profile
+        </a>
+    </div>
 </div>
 
 <div class="card admin-form-card">

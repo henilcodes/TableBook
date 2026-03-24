@@ -7,8 +7,8 @@ ob_start();
     border: 0;
     border-radius: 16px;
     color: #fff;
-    background: linear-gradient(135deg, #1f7a8c 0%, #205072 52%, #152238 100%);
-    box-shadow: 0 16px 34px rgba(21,34,56,.2);
+    background: linear-gradient(135deg, var(--tt-primary) 0%, var(--tt-accent) 52%, var(--tt-secondary) 100%);
+    box-shadow: var(--tt-shadow-lg);
 }
 .dash-hero .meta { color: rgba(255,255,255,.85); }
 .kpi-card {
@@ -93,8 +93,11 @@ ob_start();
                     <a href="<?= url('/admin/restaurants/' . $restaurant['id'] . '/menu/items') ?>" class="btn btn-outline-primary me-2 mb-2 mb-md-0">
                         <i class="bi bi-menu-button-wide"></i> Menu
                     </a>
-                    <a href="<?= url('/admin/reservations?restaurant_id=' . $restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>" class="btn btn-primary mb-2 mb-md-0">
+                    <a href="<?= url('/admin/reservations?restaurant_id=' . $restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>" class="btn btn-primary mb-2 mb-md-0 me-2">
                         <i class="bi bi-calendar-event"></i> Reservations
+                    </a>
+                    <a href="<?= url('/admin/dashboard/export?restaurant_id=' . $restaurant['id']) ?>" class="btn btn-outline-success mb-2 mb-md-0">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Export Stats
                     </a>
                 </div>
             </form>
@@ -255,8 +258,11 @@ ob_start();
                         <a class="btn btn-sm btn-outline-primary text-start" href="<?= url('/admin/reservations?restaurant_id=' . $restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>">
                             <i class="bi bi-calendar-week me-1"></i> Today Schedule
                         </a>
-                        <a class="btn btn-sm btn-outline-primary text-start" href="<?= url('/admin/export/reservations?restaurant_id=' . $restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>">
+                        <a class="btn btn-sm btn-outline-success text-start" href="<?= url('/admin/reservations/export?restaurant_id=' . $restaurant['id'] . '&date=' . urlencode(date('Y-m-d'))) ?>">
                             <i class="bi bi-download me-1"></i> Export Today CSV
+                        </a>
+                        <a class="btn btn-sm btn-outline-success text-start" href="<?= url('/admin/dashboard/export?restaurant_id=' . $restaurant['id']) ?>">
+                            <i class="bi bi-graph-up me-1"></i> Export Full Stats
                         </a>
                     </div>
                 </div>

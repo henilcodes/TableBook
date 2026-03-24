@@ -28,34 +28,50 @@
     </nav>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3 sidebar p-0">
-                <div class="list-group list-group-flush">
-                    <a href="<?= url('/account') ?>" class="list-group-item list-group-item-action <?= (strpos($_SERVER['REQUEST_URI'], '/account') !== false && strpos($_SERVER['REQUEST_URI'], '/account/reservations') === false && strpos($_SERVER['REQUEST_URI'], '/account/history') === false) ? 'active' : '' ?>">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                    <a href="<?= url('/account/reservations') ?>" class="list-group-item list-group-item-action <?= (strpos($_SERVER['REQUEST_URI'], '/account/reservations') !== false) ? 'active' : '' ?>">
-                        <i class="bi bi-calendar-event"></i> Upcoming Reservations
-                    </a>
-                    <a href="<?= url('/account/history') ?>" class="list-group-item list-group-item-action <?= (strpos($_SERVER['REQUEST_URI'], '/account/history') !== false) ? 'active' : '' ?>">
-                        <i class="bi bi-clock-history"></i> Reservation History
-                    </a>
-                    <a href="<?= url('/') ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-house"></i> Back to Home
-                    </a>
+        <div class="row min-vh-100">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 bg-white border-end px-0">
+                <div class="d-flex flex-column h-100 py-4">
+                    <div class="px-4 mb-4">
+                        <small class="text-uppercase text-muted fw-bold letter-spacing-1">Menu</small>
+                    </div>
+                    <div class="list-group list-group-flush px-2">
+                        <a href="<?= url('/account') ?>" class="list-group-item list-group-item-action border-0 rounded-3 mb-1 py-2 d-flex align-items-center <?= (strpos($_SERVER['REQUEST_URI'], '/account') !== false && strpos($_SERVER['REQUEST_URI'], '/account/reservations') === false && strpos($_SERVER['REQUEST_URI'], '/account/history') === false) ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : 'text-secondary' ?>">
+                            <i class="bi bi-grid-1x2-fill me-3 fs-5"></i> Dashboard
+                        </a>
+                        <a href="<?= url('/account/reservations') ?>" class="list-group-item list-group-item-action border-0 rounded-3 mb-1 py-2 d-flex align-items-center <?= (strpos($_SERVER['REQUEST_URI'], '/account/reservations') !== false) ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : 'text-secondary' ?>">
+                            <i class="bi bi-calendar2-check-fill me-3 fs-5"></i> Reservations
+                        </a>
+                        <a href="<?= url('/account/history') ?>" class="list-group-item list-group-item-action border-0 rounded-3 mb-1 py-2 d-flex align-items-center <?= (strpos($_SERVER['REQUEST_URI'], '/account/history') !== false) ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : 'text-secondary' ?>">
+                            <i class="bi bi-clock-history me-3 fs-5"></i> History
+                        </a>
+                        <hr class="my-3 opacity-10">
+                        <a href="<?= url('/') ?>" class="list-group-item list-group-item-action border-0 rounded-3 mb-1 py-2 d-flex align-items-center text-secondary">
+                            <i class="bi bi-arrow-left-circle-fill me-3 fs-5"></i> Back to Home
+                        </a>
+                    </div>
+                    
+                    <div class="mt-auto px-4">
+                        <div class="card bg-primary bg-opacity-10 border-0 rounded-4 p-3 mb-3">
+                            <p class="small text-primary mb-2 fw-bold">Ready to dine?</p>
+                            <a href="<?= url('/restaurants') ?>" class="btn btn-primary btn-sm rounded-pill w-100">Find a Table</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-9 py-4">
+
+            <!-- Content -->
+            <div class="col-md-9 col-lg-10 bg-light-subtle py-4 px-4 px-md-5">
                 <?php if (!empty($_SESSION['success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show">
-                        <?= htmlspecialchars($_SESSION['success']) ?>
+                    <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> <?= htmlspecialchars($_SESSION['success']) ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                     <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
                 <?php if (!empty($_SESSION['error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <?= htmlspecialchars($_SESSION['error']) ?>
+                    <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show rounded-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= htmlspecialchars($_SESSION['error']) ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                     <?php unset($_SESSION['error']); ?>

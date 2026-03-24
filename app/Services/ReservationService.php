@@ -3,6 +3,8 @@ namespace App\Services;
 
 use App\Repositories\ReservationRepository;
 use App\Repositories\RestaurantRepository;
+use App\Repositories\CustomerRepository;
+use App\Services\MailService;
 use Exception;
 
 class ReservationService
@@ -85,7 +87,32 @@ class ReservationService
         // Create reservation
         $reservationId = $this->reservationRepo->create($data);
         
-        return $this->reservationRepo->findById($reservationId);
+        $reservation = $this->reservationRepo->findById($reservationId);
+        
+        try {
+            $mailService = new MailService();
+            $restaurant = $this->restaurantRepo->findById($data['restaurant_id']);
+            
+            // Send to restaurant
+            if ($restaurant && !empty($restaurant['email'])) {
+                $mailService->sendNewReservationNotification($reservation, $restaurant['email']);
+            }
+            
+            // Send to customer
+            if (!empty($data['customer_id'])) {
+                $customerRepo = new CustomerRepository();
+                $customer = $customerRepo->findById($data['customer_id']);
+                if ($customer && !empty($customer['email'])) {
+                    $mailService->sendReservationConfirmation($reservation, $customer['email']);
+                }
+            } else if (!empty($data['guest_email'])) {
+                $mailService->sendReservationConfirmation($reservation, $data['guest_email']);
+            }
+        } catch (Exception $e) {
+            error_log('Failed to send reservation emails: ' . $e->getMessage());
+        }
+        
+        return $reservation;
     }
     
     public function canCancel($reservationId)

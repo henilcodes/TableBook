@@ -7,7 +7,7 @@
 return [
     'database' => [
         'host' => 'localhost',
-        'dbname' => 'tabletap',
+        'dbname' => 'orm',
         'username' => 'henilcode',
         'password' => 'henilcode',
         'charset' => 'utf8mb4'
@@ -31,5 +31,21 @@ return [
     'security' => [
         'csrf_token_name' => '_token',
         'password_min_length' => 8,
-    ]
+    ],
+
+    'razorpay' => [
+        'key_id' => 'rzp_test_SETKXKZKO9NW6n',
+        'key_secret' => 'mhS7kmhuo7KPP3F1Axig2jcn',
+    ],
+
+    'mail' => [
+        'driver' => 'smtp',
+        'host' => 'smtp.gmail.com',
+        'port' => 587,
+        'username' => 'HenilCode',
+        'password' => 'vlqyxhejqresrysg',
+        'encryption' => 'tls',
+        'from_address' => 'henilcode@gmail.com',
+        'from_name' => 'TableTap Reservation',
+    ],
 ];

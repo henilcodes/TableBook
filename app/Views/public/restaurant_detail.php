@@ -63,110 +63,116 @@ ob_start();
                 </div>
             </div>
 
-            <form id="bookingForm" method="POST" action="<?= url('/reservation') ?>">
+            <form id="bookingForm" class="needs-validation" novalidate method="POST" action="<?= url('/reservation') ?>">
                 <input type="hidden" name="_token" value="<?= $csrf_token ?>">
                 <input type="hidden" name="restaurant_id" value="<?= $restaurant['id'] ?>">
                 <input type="hidden" name="restaurant_slug" value="<?= $restaurant['slug'] ?>">
-                <div class="wizard-progress mb-3">
+                <div class="wizard-progress mb-4">
                     <div class="wizard-progress-bar" id="wizardProgressBar" style="width:33.33%"></div>
                 </div>
 
-                <section class="wizard-panel" id="wizard-step-1">
+                <section class="wizard-panel border-0 shadow-none p-0" id="wizard-step-1">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
-                            <label class="form-label">Date</label>
+                            <label class="form-label">Reservation Date</label>
                             <input type="date" name="reservation_date" class="form-control" required min="<?= date('Y-m-d') ?>">
+                            <div class="invalid-feedback">Please select a valid date.</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Time</label>
-                            <input type="time" name="reservation_time" class="form-control" required>
+                            <label class="form-label">Arrival Time</label>
+                            <select name="reservation_time" class="form-select" id="timeSlotSelect" required disabled>
+                                <option value="">Select Date First...</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a time.</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Party Size</label>
+                            <label class="form-label">Number of Guests</label>
                             <select name="party_size" class="form-select" required>
                                 <option value="">Select...</option>
                                 <?php for ($i = 1; $i <= 12; $i++): ?>
                                     <option value="<?= $i ?>"><?= $i ?> <?= $i === 1 ? 'Guest' : 'Guests' ?></option>
                                 <?php endfor; ?>
                             </select>
+                            <div class="invalid-feedback">Please select party size.</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Seating</label>
+                            <label class="form-label">Preferred Seating</label>
                             <select name="preferred_seating" class="form-select">
-                                <option value="any">Any</option>
+                                <option value="any">Any Seating</option>
                                 <option value="indoor">Indoor</option>
                                 <option value="outdoor">Outdoor</option>
-                                <option value="window">Window</option>
-                                <option value="bar">Bar</option>
+                                <option value="window">Window Side</option>
+                                <option value="bar">Bar Area</option>
                             </select>
                         </div>
                     </div>
-                    <div class="wizard-actions">
-                        <button type="button" id="step1NextBtn" class="btn btn-primary">
-                            <i class="bi bi-search me-1"></i> Check Availability
+                    <div class="wizard-actions mt-4">
+                        <button type="button" id="step1NextBtn" class="btn btn-primary px-5 py-2">
+                            <i class="bi bi-search me-2"></i> Find Available Tables
                         </button>
                     </div>
                 </section>
 
-                <section class="wizard-panel tt-hidden" id="wizard-step-2">
-                    <h5 class="mb-3">Available Tables</h5>
+                <section class="wizard-panel border-0 shadow-none p-0 tt-hidden" id="wizard-step-2">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="mb-0 fw-bold">Select Your Table</h5>
+                        <span class="badge badge-premium text-bg-light border text-primary" id="selectedTableBadge">No table selected</span>
+                    </div>
                     <div id="availableTables">
-                        <div id="tablesList" class="row g-2"></div>
+                        <div id="tablesList" class="row g-3"></div>
                     </div>
-                    <div class="wizard-actions">
-                        <button type="button" class="btn btn-ghost" id="step2BackBtn">
-                            <i class="bi bi-arrow-left me-1"></i> Back
+                    <div class="wizard-actions mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="step2BackBtn">
+                            <i class="bi bi-chevron-left"></i> Modify Search
                         </button>
-                        <button type="button" class="btn btn-primary" id="step2NextBtn" disabled>
-                            Continue
-                            <i class="bi bi-arrow-right ms-1"></i>
+                        <button type="button" class="btn btn-primary px-5 py-2" id="step2NextBtn" disabled>
+                            Continue to Finalize <i class="bi bi-chevron-right ms-2"></i>
                         </button>
                     </div>
                 </section>
 
-                <section class="wizard-panel tt-hidden" id="wizard-step-3">
-                    <h5 class="mb-3">Guest Information</h5>
+                <section class="wizard-panel border-0 shadow-none p-0 tt-hidden" id="wizard-step-3">
+                    <h5 class="mb-4 fw-bold">Complete Your Reservation</h5>
                     <?php if (empty($_SESSION['customer_id'])): ?>
-                        <div class="alert alert-light border d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <span class="small">Have an account? Log in for faster checkout and booking history.</span>
-                            <span class="d-flex gap-2">
-                                <a href="<?= url('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? ('/restaurants/' . $restaurant['slug']))) ?>" class="btn btn-sm btn-outline-primary">Login</a>
-                                <a href="<?= url('/register') ?>" class="btn btn-sm btn-ghost">Register</a>
-                            </span>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Name *</label>
-                                <input type="text" name="guest_name" class="form-control" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="guest_email" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" name="guest_phone" class="form-control">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-3 mb-3">
+                                    <i class="bi bi-person-lock fs-1"></i>
+                                </div>
+                                <h4 class="fw-bold">Sign In Required</h4>
+                                <p class="text-muted mx-auto" style="max-width: 320px;">To ensure a secure booking and process your reservation, please sign in or create an account.</p>
+                                <div class="d-grid gap-2 mt-4">
+                                    <a href="<?= url('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? ('/restaurants/' . $restaurant['slug']))) ?>" class="btn btn-primary py-3">Login to Book Now</a>
+                                    <a href="<?= url('/register') ?>" class="btn btn-link text-decoration-none fw-bold">New here? Create an account</a>
+                                </div>
                             </div>
                         </div>
                     <?php else: ?>
-                        <div class="alert alert-light border mb-3">
-                            Booking as: <strong><?= htmlspecialchars($_SESSION['customer_name']) ?></strong>
+                        <div class="alert alert-light border border-primary-subtle bg-white rounded-4 mb-4 p-3 d-flex align-items-center shadow-sm">
+                            <div class="bg-primary text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-person-check-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <small class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Logged in as</small>
+                                <h5 class="mb-0 fw-bold"><?= htmlspecialchars($_SESSION['customer_name']) ?></h5>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase text-muted fw-bold small">Special Requests</label>
+                            <textarea name="notes" class="form-control p-3" rows="3" placeholder="Allergies, birthday celebrations, or specific seating preferences..."></textarea>
+                            <div class="form-text mt-2 small text-muted">We'll do our best to accommodate your requests.</div>
+                        </div>
+
+                        <div class="wizard-actions">
+                            <button type="button" class="btn btn-outline-secondary" id="step3BackBtn">
+                                <i class="bi bi-chevron-left me-1"></i> Select Another Table
+                            </button>
+                            <button type="button" class="btn btn-primary px-5 py-2" id="openConfirmModalBtn">
+                                <i class="bi bi-check2-circle me-2"></i> Review & Confirm
+                            </button>
                         </div>
                     <?php endif; ?>
-
-                    <div class="mt-3">
-                        <label class="form-label">Special Requests (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Birthday setup, allergy note, quiet table, etc."></textarea>
-                    </div>
-
-                    <div class="wizard-actions">
-                        <button type="button" class="btn btn-ghost" id="step3BackBtn">
-                            <i class="bi bi-arrow-left me-1"></i> Back
-                        </button>
-                        <button type="button" class="btn btn-success" id="openConfirmModalBtn">
-                            <i class="bi bi-check-circle me-1"></i> Confirm Reservation
-                        </button>
-                    </div>
                 </section>
             </form>
         </div>
@@ -257,47 +263,87 @@ ob_start();
 
 <div class="modal fade" id="reservationConfirmModal" tabindex="-1" aria-labelledby="reservationConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reservationConfirmModalLabel">Confirm Your Reservation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title fw-bold" id="reservationConfirmModalLabel">
+                    <i class="bi bi-calendar-check me-2"></i> Confirm Booking
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="small text-muted">Review before final confirmation</div>
-                <ul class="list-group list-group-flush mt-2">
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span>Date</span>
-                        <strong id="confirmSummaryDate">-</strong>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span>Time</span>
-                        <strong id="confirmSummaryTime">-</strong>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span>Party Size</span>
-                        <strong id="confirmSummaryParty">-</strong>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span>Table</span>
-                        <strong id="confirmSummaryTable">-</strong>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span>Pre-order</span>
-                        <strong><span id="confirmCartQty">0</span> qty (<?= '₹' ?><span id="confirmCartTotal">0.00</span>)</strong>
-                    </li>
-                </ul>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3 shadow-sm">
+                    <i class="bi bi-clock-fill fs-2"></i>
+                </div>
+                <h5 class="fw-bold mb-1">Almost There!</h5>
+                <p class="text-muted small mb-4">Please review your reservation details below</p>
+                
+                <div class="card bg-light border-0 rounded-4 mb-4">
+                    <div class="card-body p-3">
+                        <div class="row g-3 text-start">
+                            <div class="col-6">
+                                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Date & Time</small>
+                                <div class="fw-bold" id="confirmSummaryDateTime">-</div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Guests</small>
+                                <div class="fw-bold" id="confirmSummaryParty">-</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Table</small>
+                                <div class="fw-bold" id="confirmSummaryTable">-</div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Pre-order</small>
+                                <div class="fw-bold"><span id="confirmCartQty">0</span> items</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 rounded-4 p-3 d-flex align-items-center mb-0">
+                    <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                    <div class="text-start">
+                        <div class="fw-bold small">Instant Confirmation</div>
+                        <div class="small" style="font-size: 0.75rem;">Your table will be held immediately upon confirmation.</div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Back</button>
-                <button type="button" class="btn btn-success" id="submitReservationBtn">
-                    <i class="bi bi-patch-check me-1"></i> Book Now
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold" data-bs-dismiss="modal">Go Back</button>
+                <button type="button" class="btn btn-primary px-5 py-2 shadow-sm" id="submitReservationBtn">
+                    <i class="bi bi-patch-check me-2"></i> Confirm & Book
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+<?php if (isset($_SESSION['error'])): ?>
+<!-- Proper Error Modal -->
+<div class="modal fade" id="serverErrorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white border-0 py-3">
+                <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Error</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex p-3 mb-3 shadow-sm">
+                    <i class="bi bi-x-circle fs-1"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Something went wrong</h5>
+                <p class="text-muted mb-0"><?= htmlspecialchars($_SESSION['error']) ?></p>
+            </div>
+            <div class="modal-footer border-0 p-3 pt-0 justify-content-center">
+                <button type="button" class="btn btn-danger px-5 rounded-pill" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <script>
+const restaurantHours = <?= json_encode($hours) ?>;
 let selectedTableId = null;
 let selectedTableLabel = 'Not selected';
 let currentStep = 1;
@@ -681,6 +727,81 @@ form.addEventListener('submit', function(e) {
     }
 });
 
+const dateInput = document.querySelector('input[name="reservation_date"]');
+const timeSelect = document.getElementById('timeSlotSelect');
+
+if (dateInput) {
+    dateInput.addEventListener('change', updateTimeSlots);
+}
+
+function updateTimeSlots() {
+    const dateVal = dateInput.value;
+    if (!dateVal) {
+        timeSelect.innerHTML = '<option value="">Select Date First...</option>';
+        timeSelect.disabled = true;
+        return;
+    }
+
+    const dateObj = new Date(dateVal);
+    const dayOfWeek = dateObj.getDay(); // 0 is Sunday, matches PHP format
+
+    const dayHours = restaurantHours.find(h => parseInt(h.day_of_week) === dayOfWeek);
+
+    timeSelect.innerHTML = '';
+
+    if (!dayHours || dayHours.is_closed) {
+        timeSelect.innerHTML = '<option value="">Closed on this date</option>';
+        timeSelect.disabled = true;
+        return;
+    }
+
+    const openTime = dayHours.open_time;
+    const closeTime = dayHours.close_time;
+    
+    if (!openTime || !closeTime) {
+        timeSelect.innerHTML = '<option value="">Hours unavailable</option>';
+        timeSelect.disabled = true;
+        return;
+    }
+
+    const [oH, oM] = openTime.split(':').map(Number);
+    const [cH, cM] = closeTime.split(':').map(Number);
+    let currentMins = oH * 60 + oM;
+    const closeMins = cH * 60 + cM;
+    const durationMins = 90; // Default buffer duration assumption
+
+    let optionsHtml = '<option value="">Select Time...</option>';
+    let hasSlots = false;
+
+    while (currentMins + durationMins <= closeMins) {
+        const today = new Date();
+        const isToday = today.toISOString().split('T')[0] === dateVal;
+        const nowMins = today.getHours() * 60 + today.getMinutes();
+
+        // If today, only show slots that are at least 30 mins in the future
+        if (!isToday || currentMins > nowMins + 30) {
+            const h = Math.floor(currentMins / 60);
+            const m = currentMins % 60;
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const displayH = h % 12 || 12;
+            const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
+            const displayStr = `${displayH}:${m.toString().padStart(2, '0')} ${ampm}`;
+            
+            optionsHtml += `<option value="${timeStr}">${displayStr}</option>`;
+            hasSlots = true;
+        }
+        currentMins += 30; // 30 minute intervals
+    }
+
+    if (!hasSlots) {
+        timeSelect.innerHTML = '<option value="">No slots available</option>';
+        timeSelect.disabled = true;
+    } else {
+        timeSelect.innerHTML = optionsHtml;
+        timeSelect.disabled = false;
+    }
+}
+
 step1NextBtn.addEventListener('click', checkAvailability);
 step2BackBtn.addEventListener('click', () => setStep(1, true));
 step2NextBtn.addEventListener('click', () => {
@@ -699,27 +820,30 @@ openConfirmModalBtn.addEventListener('click', () => {
     }
 
     if (!form.checkValidity()) {
-        form.reportValidity();
+        form.classList.add('was-validated');
+        TableTapUI.showToast('Please complete all required fields.', 'error');
         return;
     }
 
-    document.getElementById('confirmSummaryDate').textContent = document.getElementById('summaryDate').textContent || '-';
-    document.getElementById('confirmSummaryTime').textContent = document.getElementById('summaryTime').textContent || '-';
-    document.getElementById('confirmSummaryParty').textContent = document.getElementById('summaryParty').textContent || '-';
-    document.getElementById('confirmSummaryTable').textContent = document.getElementById('summaryTable').textContent || '-';
+    const data = new FormData(form);
+    const dateStr = data.get('reservation_date') || '-';
+    const timeStr = data.get('reservation_time') || '-';
+    
+    document.getElementById('confirmSummaryDateTime').textContent = `${dateStr} @ ${timeStr}`;
+    document.getElementById('confirmSummaryParty').textContent = data.get('party_size') ? `${data.get('party_size')} guests` : '-';
+    document.getElementById('confirmSummaryTable').textContent = selectedTableLabel;
     document.getElementById('confirmCartQty').textContent = String(cartCount || 0);
-    document.getElementById('confirmCartTotal').textContent = Number(cartTotal || 0).toFixed(2);
-    if (!reservationConfirmModal && reservationConfirmModalEl && window.bootstrap && typeof window.bootstrap.Modal === 'function') {
-        reservationConfirmModal = new window.bootstrap.Modal(reservationConfirmModalEl);
+
+    if (!reservationConfirmModal && reservationConfirmModalEl && window.bootstrap) {
+        reservationConfirmModal = new bootstrap.Modal(reservationConfirmModalEl);
     }
     if (reservationConfirmModal) {
         reservationConfirmModal.show();
-    } else {
-        TableTapUI.showToast('Confirmation dialog is unavailable. Please refresh and try again.', 'error');
     }
 });
+
 submitReservationBtn.addEventListener('click', () => {
-    TableTapUI.setButtonLoading(submitReservationBtn, true, 'Booking...');
+    TableTapUI.setButtonLoading(submitReservationBtn, true, 'Confirming Reservation...');
     form.submit();
 });
 
@@ -744,6 +868,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateCartSummary();
         }
     } catch (_) {}
+    
+    // Auto trigger time slots if date is pre-filled
+    if (dateInput && dateInput.value) {
+        updateTimeSlots();
+    }
+    
+    // Show server error modal if present
+    const errModalEl = document.getElementById('serverErrorModal');
+    if (errModalEl && window.bootstrap) {
+        new bootstrap.Modal(errModalEl).show();
+    }
 });
 </script>
 
