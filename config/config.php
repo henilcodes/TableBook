@@ -34,18 +34,18 @@ return [
     ],
 
     'razorpay' => [
-        'key_id' => 'rzp_test_SETKXKZKO9NW6n',
-        'key_secret' => 'mhS7kmhuo7KPP3F1Axig2jcn',
+        'key_id' => '',
+        'key_secret' => '',
     ],
 
     'mail' => [
         'driver' => 'smtp',
         'host' => 'smtp.gmail.com',
         'port' => 587,
-        'username' => 'HenilCode',
-        'password' => 'vlqyxhejqresrysg',
+        'username' => '',
+        'password' => '',
         'encryption' => 'tls',
-        'from_address' => 'henilcode@gmail.com',
+        'from_address' => '',
         'from_name' => 'TableTap Reservation',
     ],
 ];
